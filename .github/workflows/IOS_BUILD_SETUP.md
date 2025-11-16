@@ -31,21 +31,48 @@
 
 ## ステップ 2: App Store Connect API Key の作成
 
+### 2.0 事前確認
+
+**必要な権限**: Account Holder または Admin ロールが必要です
+
+- Account Holder の場合: すべての権限があります
+- Admin の場合: Account Holder から API へのアクセス権限が付与されている必要があります
+- Developer ロールでは API Key を作成できません
+
+**権限の確認方法**:
+1. App Store Connect にログイン
+2. 右上のユーザー名をクリック → **View Profile**
+3. **Role** を確認（Account Holder または Admin であることを確認）
+
 ### 2.1 API Key の生成
 
 1. [App Store Connect](https://appstoreconnect.apple.com/) にログイン
-2. **Users and Access** → **Keys** タブを選択
-3. **App Store Connect API** セクションで **+** ボタンをクリック
-4. 以下を設定：
-   - **Name**: `GitHub Actions` (任意の名前)
+
+2. **Users and Access** を選択（左側メニューまたは上部メニュー）
+
+3. **Integrations** タブをクリック（Keys タブではありません！）
+   - ページが開くと **App Store Connect API** が選択された状態になります
+
+4. **Team Keys** セクションを選択
+   - 初めての場合は **Generate API Key** ボタンが表示されます
+   - 既に API Key がある場合は **+** ボタンをクリック
+
+5. 以下を設定：
+   - **Name**: `GitHub Actions` (任意の名前、後で変更不可)
    - **Access**: `Developer` または `Admin` を選択
-5. **Generate** をクリック
-6. 以下の情報をメモ：
+     - **Developer** 推奨（最小権限の原則）
+     - 証明書とプロビジョニングプロファイルの管理には Developer で十分です
+
+6. **Generate** をクリック
+
+7. 以下の情報を**必ずメモ**：
    - **Key ID**（例: `ABC123DEF4`）
-   - **Issuer ID**（ページ上部に表示されている UUID）
+   - **Issuer ID**（ページ上部に表示されている UUID、例: `12345678-1234-1234-1234-123456789012`）
    - **Download API Key** ボタンをクリックして `.p8` ファイルをダウンロード
 
-**重要**: `.p8` ファイルは一度しかダウンロードできません。安全な場所に保存してください。
+**重要**:
+- `.p8` ファイルは**一度しかダウンロードできません**。安全な場所に保存してください
+- API Key は作成後、名前や権限を変更できません。変更が必要な場合は削除して再作成する必要があります
 
 ### 2.2 API Key を Base64 エンコード
 
@@ -176,14 +203,31 @@ GitHub リポジトリで以下の Secrets を設定します。
 
 ## トラブルシューティング
 
+### API Key が作成できない（Integrations タブが見つからない）
+
+**原因**: 権限が不足している、または Account Holder が API アクセスを有効化していない
+
+**解決策**:
+1. 自分のロールを確認（Account Holder または Admin が必要）
+2. Account Holder の場合: すぐに API Key を作成可能
+3. Admin の場合: Account Holder に以下を依頼
+   - App Store Connect → Users and Access → Integrations
+   - API アクセスを有効化
+4. Developer ロールの場合: Admin または Account Holder に昇格を依頼
+
 ### エラー: "No signing certificate found"
 
-**原因**: App Store Connect API Key が正しく設定されていない
+**原因**: App Store Connect API Key が正しく設定されていない、または権限不足
 
 **解決策**:
 1. GitHub Secrets が正しく設定されているか確認
+   - `APP_STORE_CONNECT_KEY_ID`: Key ID が正しいか
+   - `APP_STORE_CONNECT_ISSUER_ID`: Issuer ID（UUID形式）が正しいか
+   - `APP_STORE_CONNECT_KEY_CONTENT`: Base64 エンコードされた .p8 ファイルの内容
+   - `APPLE_TEAM_ID`: Team ID が正しいか
 2. API Key の権限が `Developer` または `Admin` であることを確認
-3. Team ID が正しいか確認
+3. Team ID が Apple Developer Portal の Membership ページのものと一致しているか確認
+4. API Key が有効期限内であることを確認（通常は無期限ですが、削除されていないか確認）
 
 ### エラー: "No devices registered"
 
