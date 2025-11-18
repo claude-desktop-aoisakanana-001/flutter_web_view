@@ -1,0 +1,77 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build iOS development IPA"
+  lane :build_dev do
+    # Setup signing using App Store Connect API
+    setup_ci if ENV['CI']
+
+    # Get App Store Connect API Key from environment variables
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_ISSUER_ID'],
+      key_content: ENV['APP_STORE_CONNECT_KEY_CONTENT'],
+      is_key_content_base64: true
+    )
+
+    # Sync certificates and provisioning profiles
+    # Note: This requires a certificates repository to be set up
+    # Alternative: Use automatic signing with match or manual certificate setup
+
+    # For development build without match, use automatic signing
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      path: "Runner.xcodeproj",
+      team_id: ENV['APPLE_TEAM_ID'],
+      bundle_identifier: "com.example.yomiagerunApp"
+    )
+
+    # Build the app
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "development",
+      export_options: {
+        method: "development",
+        provisioningProfiles: {
+          "com.example.yomiagerunApp" => "match Development com.example.yomiagerunApp"
+        }
+      },
+      output_directory: "./build",
+      output_name: "yomiagerun_app.ipa"
+    )
+  end
+
+  desc "Build iOS App Store IPA"
+  lane :build_release do
+    setup_ci if ENV['CI']
+
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_ISSUER_ID'],
+      key_content: ENV['APP_STORE_CONNECT_KEY_CONTENT'],
+      is_key_content_base64: true
+    )
+
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      path: "Runner.xcodeproj",
+      team_id: ENV['APPLE_TEAM_ID'],
+      bundle_identifier: "com.example.yomiagerunApp"
+    )
+
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "com.example.yomiagerunApp" => "match AppStore com.example.yomiagerunApp"
+        }
+      },
+      output_directory: "./build",
+      output_name: "yomiagerun_app.ipa"
+    )
+  end
+end
