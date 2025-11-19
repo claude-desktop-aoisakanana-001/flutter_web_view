@@ -57,10 +57,6 @@ jobs:
           mkdir -p ~/private_keys
           echo "$APP_STORE_CONNECT_KEY_CONTENT" | base64 --decode > ~/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
-      - name: Build iOS with Flutter
-        run: |
-          flutter build ios --release --no-codesign
-
       - name: Build IPA with Fastlane
         working-directory: ios
         env:
