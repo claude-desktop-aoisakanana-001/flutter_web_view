@@ -39,7 +39,7 @@ platform :ios do
       },
       output_directory: "./build",
       output_name: "yomiagerun_app.ipa",
-      xcargs: "-allowProvisioningUpdates"
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']}"
     )
   end
 
@@ -73,7 +73,7 @@ platform :ios do
       },
       output_directory: "./build",
       output_name: "yomiagerun_app.ipa",
-      xcargs: "-allowProvisioningUpdates"
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']}"
     )
   end
 
