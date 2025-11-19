@@ -38,7 +38,8 @@ platform :ios do
         }
       },
       output_directory: "./build",
-      output_name: "yomiagerun_app.ipa"
+      output_name: "yomiagerun_app.ipa",
+      export_xcargs: "-allowProvisioningUpdates"
     )
   end
 
@@ -71,7 +72,8 @@ platform :ios do
         }
       },
       output_directory: "./build",
-      output_name: "yomiagerun_app.ipa"
+      output_name: "yomiagerun_app.ipa",
+      export_xcargs: "-allowProvisioningUpdates"
     )
   end
 
