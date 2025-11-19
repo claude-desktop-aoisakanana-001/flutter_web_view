@@ -48,6 +48,17 @@ platform :ios do
       is_key_content_base64: true
     )
 
+    # Override code signing identity for Release builds
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "Runner.xcodeproj",
+      team_id: ENV['APPLE_TEAM_ID'],
+      bundle_identifier: "com.example.yomiagerunApp",
+      code_sign_identity: "Apple Distribution",
+      targets: ["Runner"],
+      build_configurations: ["Release"]
+    )
+
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
