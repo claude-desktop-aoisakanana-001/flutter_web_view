@@ -37,7 +37,7 @@ platform :ios do
     )
   end
 
-  desc "Build iOS App Store IPA"
+  desc "Build iOS App Store IPA for TestFlight"
   lane :build_release do
     setup_ci if ENV['CI']
 
@@ -48,20 +48,14 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    update_code_signing_settings(
-      use_automatic_signing: true,
-      path: "Runner.xcodeproj",
-      team_id: ENV['APPLE_TEAM_ID'],
-      bundle_identifier: "com.example.yomiagerunApp"
-    )
-
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
+      configuration: "Release",
       export_method: "app-store",
       output_directory: "./build",
       output_name: "yomiagerun_app.ipa",
-      xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']}"
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']} DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']}"
     )
   end
 
