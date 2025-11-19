@@ -55,7 +55,7 @@ platform :ios do
       export_method: "app-store",
       output_directory: "./build",
       output_name: "yomiagerun_app.ipa",
-      xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']} DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']} CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Distribution'"
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']} DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']} CODE_SIGN_IDENTITY='Apple Distribution'"
     )
   end
 
