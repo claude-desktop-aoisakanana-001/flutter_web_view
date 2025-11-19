@@ -48,17 +48,6 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    # Override code signing identity for Release builds
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: "Runner.xcodeproj",
-      team_id: ENV['APPLE_TEAM_ID'],
-      bundle_identifier: "com.example.yomiagerunApp",
-      code_sign_identity: "Apple Distribution",
-      targets: ["Runner"],
-      build_configurations: ["Release"]
-    )
-
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
@@ -66,7 +55,7 @@ platform :ios do
       export_method: "app-store",
       output_directory: "./build",
       output_name: "yomiagerun_app.ipa",
-      xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']} DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']}"
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']} DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']} CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY='Apple Distribution'"
     )
   end
 
