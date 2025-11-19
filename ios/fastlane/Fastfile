@@ -31,12 +31,6 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       export_method: "development",
-      export_options: {
-        method: "development",
-        provisioningProfiles: {
-          "com.example.yomiagerunApp" => "match Development com.example.yomiagerunApp"
-        }
-      },
       output_directory: "./build",
       output_name: "yomiagerun_app.ipa",
       xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']}"
@@ -65,12 +59,6 @@ platform :ios do
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       export_method: "app-store",
-      export_options: {
-        method: "app-store",
-        provisioningProfiles: {
-          "com.example.yomiagerunApp" => "match AppStore com.example.yomiagerunApp"
-        }
-      },
       output_directory: "./build",
       output_name: "yomiagerun_app.ipa",
       xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']}"
