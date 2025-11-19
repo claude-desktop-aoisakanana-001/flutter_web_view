@@ -56,10 +56,6 @@ jobs:
           echo "$APP_STORE_CONNECT_KEY_CONTENT" | base64 --decode > ~/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
           chmod 600 ~/private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_KEY_ID }}.p8
 
-      - name: Build iOS with Flutter
-        run: |
-          flutter build ios --release --no-codesign
-
       - name: Build and Upload to TestFlight
         working-directory: ios
         env:
