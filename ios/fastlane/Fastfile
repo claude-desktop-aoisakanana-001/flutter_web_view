@@ -48,6 +48,16 @@ platform :ios do
       is_key_content_base64: true
     )
 
+    # Update code signing settings for App Store distribution
+    # Use automatic signing with App Store Connect API for certificate management
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      path: "Runner.xcodeproj",
+      team_id: ENV['APPLE_TEAM_ID'],
+      bundle_identifier: "com.example.yomiagerunApp"
+    )
+
+    # Build the app with automatic signing
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
@@ -55,7 +65,16 @@ platform :ios do
       export_method: "app-store",
       output_directory: "./build",
       output_name: "yomiagerun_app.ipa",
-      xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']} DEVELOPMENT_TEAM=#{ENV['APPLE_TEAM_ID']}"
+      export_options: {
+        method: "app-store",
+        teamID: ENV['APPLE_TEAM_ID'],
+        uploadBitcode: false,
+        uploadSymbols: true,
+        compileBitcode: false,
+        signingStyle: "automatic",
+        iCloudContainerEnvironment: "Production"
+      },
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']}"
     )
   end
 
