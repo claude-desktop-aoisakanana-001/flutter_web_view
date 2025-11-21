@@ -54,7 +54,9 @@ platform :ios do
       use_automatic_signing: true,
       path: "Runner.xcodeproj",
       team_id: ENV['APPLE_TEAM_ID'],
-      bundle_identifier: "com.example.yomiagerunApp"
+      bundle_identifier: "com.example.yomiagerunApp",
+      code_sign_identity: "",  # Clear any manually set signing identity
+      profile_name: ""         # Clear any manually set provisioning profile
     )
 
     # Build the app with automatic signing
