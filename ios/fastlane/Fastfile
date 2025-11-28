@@ -14,17 +14,18 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    # Run Flutter build to prepare iOS app
-    UI.message("🔨 Building Flutter app for iOS development...")
-    sh("cd .. && flutter build ios --debug --no-codesign")
-
-    # For development build without match, use automatic signing
+    # Configure code signing settings BEFORE Flutter build
+    UI.message("🔐 Configuring code signing settings...")
     update_code_signing_settings(
       use_automatic_signing: true,
       path: "Runner.xcodeproj",
       team_id: ENV['APPLE_TEAM_ID'],
       bundle_identifier: "com.example.yomiagerunApp"
     )
+
+    # Run Flutter build to prepare iOS app
+    UI.message("🔨 Building Flutter app for iOS development...")
+    sh("cd .. && flutter build ios --debug --no-codesign")
 
     # Build the app
     build_app(
@@ -48,12 +49,9 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    # Run Flutter build to prepare iOS app
-    UI.message("🔨 Building Flutter app for iOS release...")
-    sh("cd .. && flutter build ios --release --no-codesign")
-
     # Update code signing settings for App Store distribution
-    # Use automatic signing with App Store Connect API for certificate management
+    # This MUST be done BEFORE Flutter build, as Flutter uses Xcode to compile
+    UI.message("🔐 Configuring code signing settings...")
     update_code_signing_settings(
       use_automatic_signing: true,
       path: "Runner.xcodeproj",
@@ -62,6 +60,10 @@ platform :ios do
       code_sign_identity: "",  # Clear any manually set signing identity
       profile_name: ""         # Clear any manually set provisioning profile
     )
+
+    # Run Flutter build to prepare iOS app
+    UI.message("🔨 Building Flutter app for iOS release...")
+    sh("cd .. && flutter build ios --release --no-codesign")
 
     # Build the app with automatic signing
     build_app(
