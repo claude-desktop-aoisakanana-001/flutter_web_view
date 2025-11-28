@@ -14,9 +14,9 @@ platform :ios do
       is_key_content_base64: true
     )
 
-    # Sync certificates and provisioning profiles
-    # Note: This requires a certificates repository to be set up
-    # Alternative: Use automatic signing with match or manual certificate setup
+    # Run Flutter build to prepare iOS app
+    UI.message("🔨 Building Flutter app for iOS development...")
+    sh("cd .. && flutter build ios --debug --no-codesign")
 
     # For development build without match, use automatic signing
     update_code_signing_settings(
@@ -47,6 +47,10 @@ platform :ios do
       key_content: ENV['APP_STORE_CONNECT_KEY_CONTENT'],
       is_key_content_base64: true
     )
+
+    # Run Flutter build to prepare iOS app
+    UI.message("🔨 Building Flutter app for iOS release...")
+    sh("cd .. && flutter build ios --release --no-codesign")
 
     # Update code signing settings for App Store distribution
     # Use automatic signing with App Store Connect API for certificate management
