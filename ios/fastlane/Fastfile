@@ -65,7 +65,44 @@ platform :ios do
     UI.message("🔨 Building Flutter app for iOS release...")
     sh("cd .. && flutter build ios --release --no-codesign")
 
-    # Build the app with automatic signing
+    # Create or download distribution certificate
+    UI.message("📜 Managing distribution certificate...")
+    cert(
+      api_key: api_key,
+      team_id: ENV['APPLE_TEAM_ID'],
+      keychain_path: ENV['KEYCHAIN_PATH'],
+      keychain_password: ""
+    )
+
+    # Create or download provisioning profile
+    UI.message("📋 Managing provisioning profile...")
+    sigh(
+      api_key: api_key,
+      app_identifier: "com.example.yomiagerunApp",
+      team_id: ENV['APPLE_TEAM_ID'],
+      adhoc: false,
+      readonly: false,
+      force: true
+    )
+
+    # Get the provisioning profile UUID from lane context
+    profile_uuid = lane_context[SharedValues::SIGH_UUID]
+    profile_name = lane_context[SharedValues::SIGH_NAME]
+
+    UI.message("Using provisioning profile: #{profile_name} (#{profile_uuid})")
+
+    # Update to manual signing with the downloaded profile
+    UI.message("🔐 Updating to manual signing for archive...")
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "Runner.xcodeproj",
+      team_id: ENV['APPLE_TEAM_ID'],
+      bundle_identifier: "com.example.yomiagerunApp",
+      code_sign_identity: "iPhone Distribution",
+      profile_name: profile_name
+    )
+
+    # Build the app with manual signing using the downloaded profile
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
@@ -79,10 +116,12 @@ platform :ios do
         uploadBitcode: false,
         uploadSymbols: true,
         compileBitcode: false,
-        signingStyle: "automatic",
-        iCloudContainerEnvironment: "Production"
+        provisioningProfiles: {
+          "com.example.yomiagerunApp" => profile_name
+        }
       },
-      xcargs: "-allowProvisioningUpdates -authenticationKeyPath ~/private_keys/AuthKey_#{ENV['APP_STORE_CONNECT_KEY_ID']}.p8 -authenticationKeyID #{ENV['APP_STORE_CONNECT_KEY_ID']} -authenticationKeyIssuerID #{ENV['APP_STORE_CONNECT_ISSUER_ID']}"
+      codesigning_identity: "iPhone Distribution",
+      xcargs: "-allowProvisioningUpdates"
     )
   end
 
