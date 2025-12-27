@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:yomiagerun_app/features/tts/presentation/speed_settings.dart';
 
 /// 小説閲覧画面
 ///
@@ -28,32 +29,42 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
           ),
         ],
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.auto_stories,
-              size: 100,
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'よみあげRun',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '小説閲覧画面（準備中）',
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'WebView 統合は Issue #8 で実装予定',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.secondary,
+            // プレースホルダーコンテンツ
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.auto_stories,
+                    size: 100,
+                    color: Theme.of(context).colorScheme.primary,
                   ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'よみあげRun',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    '小説閲覧画面（準備中）',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'WebView 統合は Issue #8 で実装予定',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                  ),
+                ],
+              ),
             ),
+
+            // 読み上げ速度設定
+            const SpeedSettings(),
           ],
         ),
       ),
