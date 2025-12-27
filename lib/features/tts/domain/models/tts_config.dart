@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'tts_config.freezed.dart';
-part 'tts_config.g.json.dart';
+part 'tts_config.g.dart';
 
 /// TTS（Text-to-Speech）の設定
 ///
