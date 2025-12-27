@@ -249,22 +249,27 @@ class ParsedNovel with _$ParsedNovel {
 
 ## 4. データフロー
 
-### 4.1 小説読み込みから読み上げまでのフロー
+### 4.1 小説読み込みから読み上げまでのフロー ⚠️ **2025-11-30 更新**
 
 ```
 1. ユーザーがURLを入力
     ↓
 2. NovelReaderNotifier.loadNovel(url)
     ↓
-3. NarouParserService.parseFromUrl(url)
+3. NarouParserService.parseFromWebView(url)
     ↓
-    3-1. httpパッケージでHTMLを取得
+    3-1. WebViewController でページを読み込み
     ↓
-    3-2. htmlパッケージでパース
+    3-2. ページ読み込み完了を待機
     ↓
-    3-3. セレクタで本文を抽出
+    3-3. JavaScript Injection でDOMから情報を取得
+         - document.querySelector('.novel_title')
+         - document.querySelector('#novel_honbun p')
+         - など
     ↓
-    3-4. ParsedNovelモデルに変換
+    3-4. JSON形式で結果を受け取り
+    ↓
+    3-5. ParsedNovelモデルに変換
     ↓
 4. NovelContentに変換して状態に保存
     ↓
@@ -284,6 +289,11 @@ class ParsedNovel with _$ParsedNovel {
     ↓
 12. UI（NovelContentView）でハイライト表示 + 自動スクロール
 ```
+
+**WebView使用時の追加考慮事項**:
+- WebView の初期化は起動時に一度だけ実行
+- JavaScript Bridge の設定
+- メモリリーク防止のための適切なライフサイクル管理
 
 ### 4.2 状態管理のフロー
 
@@ -338,40 +348,66 @@ class MyWidget extends ConsumerWidget {
 }
 ```
 
-### 5.3 HTML解析戦略
+### 5.3 HTML解析戦略 ⚠️ **2025-11-30 更新**
 
-**アプローチ**: セレクタベースのパース
+**アプローチ**: WebView + JavaScript Injection による DOM取得
 
 ```dart
 class NarouParserService {
-  Future<ParsedNovel> parseFromUrl(String url) async {
-    // 1. HTTP GET
-    final response = await http.get(Uri.parse(url));
+  final WebViewController _webViewController;
 
-    // 2. HTMLパース
-    final document = parse(response.body);
+  Future<ParsedNovel> parseFromWebView(String url) async {
+    // 1. WebView でページを読み込み
+    await _webViewController.loadRequest(Uri.parse(url));
 
-    // 3. セレクタで要素を取得
-    final title = document.querySelector('.novel_title')?.text;
-    final author = document.querySelector('.novel_author')?.text;
-    final paragraphs = document
-        .querySelectorAll('.novel_text p')
-        .map((e) => e.text)
-        .toList();
+    // 2. ページ読み込み完了を待機
+    await _waitForPageLoad();
+
+    // 3. JavaScript を実行して DOM から情報を取得
+    final title = await _webViewController.runJavaScriptReturningResult(
+      "document.querySelector('.novel_title')?.textContent || ''",
+    ) as String;
+
+    final author = await _webViewController.runJavaScriptReturningResult(
+      "document.querySelector('.novel_writername')?.textContent || ''",
+    ) as String;
+
+    final paragraphsJson = await _webViewController.runJavaScriptReturningResult(
+      """
+      JSON.stringify(
+        Array.from(document.querySelectorAll('#novel_honbun p'))
+          .map(p => p.textContent.trim())
+      )
+      """,
+    ) as String;
+    final paragraphs = (jsonDecode(paragraphsJson) as List).cast<String>();
 
     // 4. モデルに変換
     return ParsedNovel(
-      title: title ?? '',
-      author: author ?? '',
+      title: title,
+      author: author,
       paragraphs: paragraphs,
     );
+  }
+
+  Future<void> _waitForPageLoad() async {
+    // ページ読み込み完了の検出ロジック
+    // JavaScript の document.readyState を監視
   }
 }
 ```
 
+**利点**:
+- **利用規約を遵守**: 公式サイトを通じた閲覧
+- JavaScript実行済みのDOMにアクセス可能
+- ログイン状態の保持が可能
+- 動的コンテンツにも対応
+
 **注意点**:
+- WebView の初期化とライフサイクル管理が必要
+- JavaScript 実行の非同期処理に注意
+- メモリ使用量がHTTP直接取得より大きい
 - セレクタはHTML構造に依存するため、サイトの変更に脆弱
-- 初期段階で正確なセレクタを特定する必要あり（Issue化）
 
 ---
 
@@ -626,7 +662,8 @@ void main() {
 
 | 日付 | バージョン | 変更内容 |
 |------|----------|---------|
-| 2025-11-30 | 1.0.0 | 初版作成。ハイライト・自動スクロール機能を含む |
+| 2025-11-30 | 1.0.0 | 初版作成。HTTP直接取得を前提としたアーキテクチャ |
+| 2025-11-30 | 1.1.0 | **重要な変更**: WebView + JavaScript Injection方式に変更。HTML解析戦略とデータフローを更新。利用規約遵守のため |
 
 ---
 

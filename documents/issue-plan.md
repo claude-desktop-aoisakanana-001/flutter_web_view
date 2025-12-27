@@ -103,14 +103,15 @@
 
 ---
 
-### Issue #3: HTML解析機能の実装
+### Issue #3: WebView + JavaScript Injection による HTML解析機能の実装 ⚠️ **2025-11-30 更新**
 
 **優先度**: 最高
-**見積もり**: 2時間
+**見積もり**: 3時間（WebView対応により増加）
 **依存**: Issue #2
 
 #### 概要
-Issue #2で特定したセレクタを使用して、小説家になろうのHTMLから本文を抽出する機能を実装する。
+WebView と JavaScript Injection を使用して、小説家になろうのDOMから本文を抽出する機能を実装する。
+**重要**: 利用規約を遵守するため、HTTP直接取得ではなくWebView方式を採用。
 
 #### タスク
 - [ ] `ParsedNovel` モデルを作成（Freezed使用）
@@ -126,24 +127,32 @@ Issue #2で特定したセレクタを使用して、小説家になろうのHTM
   }
   ```
 - [ ] `NarouParserService` を実装（Riverpod使用）
-  - `parseFromUrl(String url)` メソッド
-  - HTTP GET → HTML取得
-  - htmlパッケージでパース
-  - セレクタで要素を抽出
-  - ルビの処理
+  - `parseFromWebView(String url)` メソッド
+  - WebViewController でページを読み込み
+  - JavaScript Injection で DOM から情報を取得
+    - `document.querySelector('.novel_title')` でタイトル
+    - `document.querySelector('#novel_honbun p')` で本文段落
+    - `document.querySelector('.novel_writername')` で作者名
+  - JSON形式で結果を受け取り、パース
+  - ルビ（`<ruby>` タグ）の処理
+- [ ] WebView の初期化とライフサイクル管理
+  - ページ読み込み完了の検出
+  - メモリリーク防止
 - [ ] エラーハンドリング
-  - ネットワークエラー
+  - ページ読み込みエラー
+  - JavaScript実行エラー
   - パースエラー（想定外のHTML構造）
 - [ ] ユニットテストを作成
-  - サンプルHTMLでのパーステスト
+  - モックWebViewでのパーステスト
   - エラーハンドリングのテスト
 - [ ] コード生成を実行（`dart run build_runner build`）
 
 #### 成功基準
-- [ ] サンプル小説URLから正しく本文を抽出できる
+- [ ] WebView経由でサンプル小説URLから正しく本文を抽出できる
 - [ ] ルビが適切に処理されている
 - [ ] ユニットテストが成功
 - [ ] `flutter analyze` でエラーなし
+- [ ] 利用規約を遵守した実装になっている
 
 ---
 
@@ -624,7 +633,8 @@ Issue #3 + Issue #4
 
 | 日付 | バージョン | 変更内容 |
 |------|----------|---------|
-| 2025-11-30 | 1.0.0 | 初版作成。HTML調査Issue追加、ハイライト・自動スクロールIssue追加 |
+| 2025-11-30 | 1.0.0 | 初版作成。HTTP直接取得を前提としたIssue計画 |
+| 2025-11-30 | 1.1.0 | **重要な変更**: Issue #3をWebView + JavaScript Injection方式に変更。利用規約遵守のため、実装方針を全面的に見直し |
 
 ---
 
