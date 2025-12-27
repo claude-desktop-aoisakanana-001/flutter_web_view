@@ -70,14 +70,17 @@ class NovelContentView extends ConsumerWidget {
           children: [
             Icon(
               Icons.book_outlined,
-              size: 64,
+              size: 48,
               color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
             ),
-            const SizedBox(height: 16),
-            Text(
-              'URLを入力して小説を読み込んでください',
-              style: Theme.of(context).textTheme.bodyLarge,
-              textAlign: TextAlign.center,
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'URLを入力して小説を読み込んでください',
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),
