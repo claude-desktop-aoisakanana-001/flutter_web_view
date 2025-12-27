@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'parsed_novel.freezed.dart';
-part 'parsed_novel.g.json.dart';
+part 'parsed_novel.g.dart';
 
 /// 小説家になろうから解析した小説データ
 ///

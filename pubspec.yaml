@@ -45,9 +45,11 @@ dependencies:
   # HTTP & HTML解析
   http: ^1.0.0
   html: ^0.15.0
+  webview_flutter: ^4.0.0
 
   # データモデル
   freezed_annotation: ^2.4.0
+  json_annotation: ^4.9.0
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +65,7 @@ dev_dependencies:
   # コード生成
   build_runner: ^2.4.0
   freezed: ^2.4.0
+  json_serializable: ^6.7.0
   riverpod_generator: ^2.3.0
 
 # For information on the generic Dart part of this file, see the
