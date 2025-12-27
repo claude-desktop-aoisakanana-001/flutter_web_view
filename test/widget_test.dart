@@ -22,11 +22,11 @@ void main() {
 
     // Verify that the app title is displayed
     expect(find.text('よみあげRun'), findsWidgets);
-    // Verify that the placeholder text is displayed
-    expect(find.text('小説閲覧画面（準備中）'), findsOneWidget);
+    // Verify that the URL input prompt is displayed
+    expect(find.text('URLを入力して小説を読み込んでください'), findsOneWidget);
     // Verify that the settings button is displayed
     expect(find.byIcon(Icons.settings), findsOneWidget);
-    // Verify that the FAB is displayed
-    expect(find.byIcon(Icons.add), findsOneWidget);
+    // Verify that the load button is displayed
+    expect(find.text('読み込み'), findsOneWidget);
   });
 }
