@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:yomiagerun_app/features/tts/presentation/speed_settings.dart';
+import 'package:yomiagerun_app/features/tts/presentation/playback_controller.dart';
 
 /// 小説閲覧画面
 ///
@@ -65,6 +66,9 @@ class _NovelReaderScreenState extends State<NovelReaderScreen> {
 
             // 読み上げ速度設定
             const SpeedSettings(),
+
+            // 再生コントローラー
+            const PlaybackController(),
           ],
         ),
       ),
