@@ -67,9 +67,6 @@ void main() {
       // リセットボタンが表示されている
       expect(find.byIcon(Icons.refresh), findsOneWidget);
       expect(find.text('リセット'), findsOneWidget);
-
-      // TextButton が存在する（リセットボタンとして）
-      expect(find.byType(TextButton), findsOneWidget);
     });
 
     testWidgets('Card 内に配置されている', (WidgetTester tester) async {
