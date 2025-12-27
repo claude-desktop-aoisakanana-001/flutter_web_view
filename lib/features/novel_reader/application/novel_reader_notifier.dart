@@ -12,13 +12,21 @@ part 'novel_reader_notifier.g.dart';
 /// URL から小説を読み込み、表示用のデータを管理します。
 @riverpod
 class NovelReaderNotifier extends _$NovelReaderNotifier {
-  late WebViewController _webViewController;
+  WebViewController? _webViewController;
 
   @override
   NovelReaderState build() {
-    // WebViewController を初期化
-    _webViewController = WebViewHelper.createController();
     return const NovelReaderState();
+  }
+
+  /// WebViewController を取得または作成
+  ///
+  /// テスト環境では WebViewController が作成されないように遅延初期化します。
+  WebViewController _getOrCreateController() {
+    if (_webViewController == null) {
+      _webViewController = WebViewHelper.createController();
+    }
+    return _webViewController!;
   }
 
   /// URL から小説を読み込む
@@ -41,10 +49,13 @@ class NovelReaderNotifier extends _$NovelReaderNotifier {
     );
 
     try {
+      // WebViewController を取得（遅延初期化）
+      final controller = _getOrCreateController();
+
       // NarouParserService を使用して小説を解析
       final parserService = ref.read(narouParserServiceProvider.notifier);
       final parsedNovel = await parserService.parseFromWebView(
-        webViewController: _webViewController,
+        webViewController: controller,
         url: url,
       );
 
