@@ -65,6 +65,7 @@ class NovelContentView extends ConsumerWidget {
     if (readerState.novelContent == null) {
       return Center(
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
