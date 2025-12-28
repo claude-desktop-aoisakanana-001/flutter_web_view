@@ -7,12 +7,13 @@ part of 'playback_controller_notifier.dart';
 // **************************************************************************
 
 String _$playbackControllerNotifierHash() =>
-    r'3ea8edfe1c199f47dfded14d010f1c0da6240834';
+    r'8d274c06d426b0380cf9de1c8a8e121dcaf329d4';
 
 /// 再生コントローラーの状態を管理する Notifier
 ///
 /// TtsService と連携して再生/一時停止/停止を制御します。
 /// Issue #10: 小説コンテンツとの統合
+/// Issue #11: JavaScript Injection によるハイライトとスクロール
 ///
 /// Copied from [PlaybackControllerNotifier].
 @ProviderFor(PlaybackControllerNotifier)
