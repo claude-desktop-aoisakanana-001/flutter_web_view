@@ -7,7 +7,7 @@ part of 'novel_reader_notifier.dart';
 // **************************************************************************
 
 String _$novelReaderNotifierHash() =>
-    r'59844917d5e98f2e3cc0b2526f4413649f99491b';
+    r'0715556c93edfe6727c1cf9db12c9f42c0a40766';
 
 /// 小説リーダーの状態を管理する Notifier
 ///
