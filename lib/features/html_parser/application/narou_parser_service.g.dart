@@ -7,7 +7,7 @@ part of 'narou_parser_service.dart';
 // **************************************************************************
 
 String _$narouParserServiceHash() =>
-    r'44f396df8226085e2652aef90d360038ee6b93b5';
+    r'a6720fd3c7274aac2e40fe6a073fdcd39b5d7cee';
 
 /// 小説家になろうのHTML解析サービス
 ///

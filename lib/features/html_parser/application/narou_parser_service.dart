@@ -87,8 +87,26 @@ class NarouParserService extends _$NarouParserService {
   /// タイトルを抽出
   Future<String> _extractTitle(WebViewController controller) async {
     try {
+      // デバッグ: ページのタイトル要素を確認
+      final titleDebug = await controller.runJavaScriptReturningResult(
+        """
+        (function() {
+          const titleEl = document.querySelector('.novel_title');
+          const pageTitle = document.title;
+          return JSON.stringify({
+            hasElement: !!titleEl,
+            text: titleEl?.textContent?.trim() || '',
+            pageTitle: pageTitle,
+            allH1: Array.from(document.querySelectorAll('h1')).map(h => h.textContent.trim()),
+            allH2: Array.from(document.querySelectorAll('h2')).map(h => h.textContent.trim())
+          });
+        })()
+        """,
+      );
+      print('DEBUG Title: $titleDebug');
+
       final result = await controller.runJavaScriptReturningResult(
-        "document.querySelector('.novel_title')?.textContent?.trim() || ''",
+        "document.querySelector('.novel_title')?.textContent?.trim() || document.title || ''",
       );
       return _cleanString(result.toString());
     } catch (e) {
@@ -99,8 +117,41 @@ class NarouParserService extends _$NarouParserService {
   /// 作者名を抽出
   Future<String> _extractAuthor(WebViewController controller) async {
     try {
+      // デバッグ: ページの作者要素を確認
+      final authorDebug = await controller.runJavaScriptReturningResult(
+        """
+        (function() {
+          const authorEl = document.querySelector('.novel_writername');
+          const authorLink = document.querySelector('a[href*="/mypage/"]');
+          return JSON.stringify({
+            hasElement: !!authorEl,
+            text: authorEl?.textContent?.trim() || '',
+            linkText: authorLink?.textContent?.trim() || '',
+            allClasses: Array.from(document.querySelectorAll('[class*="writer"], [class*="author"]')).map(el => ({
+              class: el.className,
+              text: el.textContent.trim()
+            }))
+          });
+        })()
+        """,
+      );
+      print('DEBUG Author: $authorDebug');
+
+      // 作者名を取得し、「作: 」などのプレフィックスを削除
       final result = await controller.runJavaScriptReturningResult(
-        "document.querySelector('.novel_writername')?.textContent?.trim() || 'Unknown'",
+        """
+        (function() {
+          const authorEl = document.querySelector('.novel_writername');
+          if (!authorEl) {
+            const authorLink = document.querySelector('a[href*="/mypage/"]');
+            return authorLink?.textContent?.trim() || 'Unknown';
+          }
+          let authorText = authorEl.textContent.trim();
+          // 「作: 」「作者: 」などのプレフィックスを削除
+          authorText = authorText.replace(/^(作|作者|著者)[:：]\s*/, '');
+          return authorText || 'Unknown';
+        })()
+        """,
       );
       return _cleanString(result.toString());
     } catch (e) {
@@ -111,19 +162,53 @@ class NarouParserService extends _$NarouParserService {
   /// 本文段落を抽出
   Future<List<String>> _extractParagraphs(WebViewController controller) async {
     try {
+      // デバッグ: ページの本文要素を確認
+      final paragraphDebug = await controller.runJavaScriptReturningResult(
+        """
+        (function() {
+          const honbunEl = document.querySelector('#novel_honbun');
+          const pElements = document.querySelectorAll('#novel_honbun p');
+          return JSON.stringify({
+            hasHonbun: !!honbunEl,
+            pCount: pElements.length,
+            firstPText: pElements[0]?.textContent?.trim() || '',
+            allDivIds: Array.from(document.querySelectorAll('div[id]')).map(d => d.id),
+            bodyText: document.body?.textContent?.substring(0, 200) || ''
+          });
+        })()
+        """,
+      );
+      print('DEBUG Paragraphs: $paragraphDebug');
+
       // JavaScript で段落を配列として取得し、JSON形式で返す
       final result = await controller.runJavaScriptReturningResult(
         """
-        JSON.stringify(
-          Array.from(document.querySelectorAll('#novel_honbun p'))
-            .map(p => p.textContent.trim())
-            .filter(text => text.length > 0)
-        )
+        (function() {
+          // 複数のセレクタを試す
+          let paragraphs = [];
+          const selectors = ['#novel_honbun p', '#novel_view p', '.novel_view p', '.novel_body p'];
+
+          for (const selector of selectors) {
+            const elements = document.querySelectorAll(selector);
+            if (elements.length > 0) {
+              paragraphs = Array.from(elements)
+                .map(p => p.textContent.trim())
+                .filter(text => text.length > 0);
+              break;
+            }
+          }
+
+          return JSON.stringify(paragraphs);
+        })()
         """,
       );
 
       final jsonString = _cleanString(result.toString());
       final List<dynamic> paragraphsJson = jsonDecode(jsonString);
+
+      if (paragraphsJson.isEmpty) {
+        throw ParserException('本文が見つかりませんでした');
+      }
 
       return paragraphsJson.map((p) => p.toString()).toList();
     } catch (e) {
