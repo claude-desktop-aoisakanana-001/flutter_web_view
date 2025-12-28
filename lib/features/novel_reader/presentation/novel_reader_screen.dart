@@ -2,15 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:yomiagerun_app/features/novel_reader/application/novel_reader_notifier.dart';
-// import 'package:yomiagerun_app/features/novel_reader/presentation/novel_content_view.dart';
 import 'package:yomiagerun_app/features/novel_reader/application/webview_notifier.dart';
 import 'package:yomiagerun_app/features/tts/presentation/speed_settings.dart';
 import 'package:yomiagerun_app/features/tts/presentation/playback_controller.dart';
+import 'package:yomiagerun_app/features/tts/presentation/playback_controller_notifier.dart';
 
 /// 小説閲覧画面
 ///
 /// WebView を使用して「小説家になろう」のサイトをブラウザとして表示します。
 /// Issue #9: WebView ベースのブラウザ実装
+/// Issue #11: JavaScript Injection によるハイライトとスクロール
 class NovelReaderScreen extends ConsumerStatefulWidget {
   const NovelReaderScreen({super.key});
 
@@ -20,9 +21,6 @@ class NovelReaderScreen extends ConsumerStatefulWidget {
 
 class _NovelReaderScreenState extends ConsumerState<NovelReaderScreen> {
   late final WebViewController _controller;
-
-  // コメントアウト: Issue #9 - URL入力UIは使用しない
-  // final TextEditingController _urlController = TextEditingController();
 
   @override
   void initState() {
@@ -43,8 +41,6 @@ class _NovelReaderScreenState extends ConsumerState<NovelReaderScreen> {
 
   @override
   void dispose() {
-    // コメントアウト: Issue #9 - URL入力UIは使用しない
-    // _urlController.dispose();
     super.dispose();
   }
 
@@ -86,24 +82,15 @@ class _NovelReaderScreenState extends ConsumerState<NovelReaderScreen> {
     ref.read(webViewNotifierProvider.notifier).onError(error.description);
   }
 
-  // コメントアウト: Issue #9 - URL入力UIは使用しない
-  // /// URL を読み込む
-  // Future<void> _loadUrl() async {
-  //   final url = _urlController.text.trim();
-  //   if (url.isEmpty) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text('URLを入力してください')),
-  //     );
-  //     return;
-  //   }
-  //
-  //   final notifier = ref.read(novelReaderNotifierProvider.notifier);
-  //   await notifier.loadNovel(url);
-  // }
-
   @override
   Widget build(BuildContext context) {
     final webViewState = ref.watch(webViewNotifierProvider);
+
+    // Issue #11: PlaybackControllerNotifier に WebViewController を設定
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(playbackControllerNotifierProvider.notifier)
+          .setWebViewController(_controller);
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -124,46 +111,10 @@ class _NovelReaderScreenState extends ConsumerState<NovelReaderScreen> {
           // ローディングインジケーター
           if (webViewState.isLoading) const LinearProgressIndicator(),
 
-          // コメントアウト: Issue #9 - URL入力UIは使用しない
-          // // URL入力欄
-          // Card(
-          //   margin: const EdgeInsets.all(16),
-          //   child: Padding(
-          //     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          //     child: Row(
-          //       children: [
-          //         Expanded(
-          //           child: TextField(
-          //             controller: _urlController,
-          //             decoration: const InputDecoration(
-          //               hintText: '小説のURLを入力',
-          //               border: InputBorder.none,
-          //               prefixIcon: Icon(Icons.link),
-          //             ),
-          //             onSubmitted: (_) => _loadUrl(),
-          //           ),
-          //         ),
-          //         const SizedBox(width: 8),
-          //         FilledButton.icon(
-          //           onPressed: _loadUrl,
-          //           icon: const Icon(Icons.download),
-          //           label: const Text('読み込み'),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
-
           // WebView（全画面）
           Expanded(
             child: WebViewWidget(controller: _controller),
           ),
-
-          // コメントアウト: Issue #9 - NovelContentViewは使用しない（Issue #11で削除）
-          // // 小説コンテンツ表示
-          // const Expanded(
-          //   child: NovelContentView(),
-          // ),
 
           // 読み上げ速度設定
           const SpeedSettings(),
