@@ -6,7 +6,7 @@ part of 'webview_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$webViewNotifierHash() => r'bb79174faa19a1f1c48e9ea7bc82b62a1f07b3c2';
+String _$webViewNotifierHash() => r'1161ee64378b09cc20d4ef2272440a522fc81fac';
 
 /// WebView の状態を管理する Notifier
 ///

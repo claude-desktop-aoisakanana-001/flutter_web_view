@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:yomiagerun_app/features/tts/presentation/playback_controller_notifier.dart';
+import 'package:yomiagerun_app/features/novel_reader/application/webview_notifier.dart';
+import 'package:yomiagerun_app/features/novel_reader/application/novel_reader_notifier.dart';
 
 /// 再生コントローラーウィジェット
 ///
 /// 再生/一時停止/停止ボタンを提供します。
+/// Issue #10: 小説ページでのみ有効化されます。
 class PlaybackController extends ConsumerWidget {
   const PlaybackController({super.key});
 
@@ -13,6 +16,12 @@ class PlaybackController extends ConsumerWidget {
     final playbackState = ref.watch(playbackControllerNotifierProvider);
     final notifier = ref.read(playbackControllerNotifierProvider.notifier);
 
+    // Issue #10: 小説ページかどうかを判定
+    final webViewState = ref.watch(webViewNotifierProvider);
+    final novelReaderState = ref.watch(novelReaderNotifierProvider);
+    final isNovelPageWithContent = webViewState.isNovelPage &&
+                                   novelReaderState.novelContent != null;
+
     return Card(
       margin: const EdgeInsets.all(16),
       child: Padding(
@@ -20,29 +29,32 @@ class PlaybackController extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // 再生状態表示
+            // 再生状態表示（Issue #10: 有効/無効状態も表示）
             Text(
-              playbackState.isPlaying ? '再生中' : '停止中',
+              !isNovelPageWithContent
+                  ? '小説ページで有効化されます'
+                  : (playbackState.isPlaying ? '再生中' : '停止中'),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: playbackState.isPlaying
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onSurface,
+                    color: !isNovelPageWithContent
+                        ? Theme.of(context).colorScheme.onSurfaceVariant
+                        : (playbackState.isPlaying
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.onSurface),
                   ),
             ),
             const SizedBox(height: 16),
 
-            // コントロールボタン
+            // コントロールボタン（Issue #10: 小説ページでのみ有効）
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 // 再生ボタン
                 IconButton.filled(
-                  onPressed: playbackState.isPlaying
+                  onPressed: (!isNovelPageWithContent || playbackState.isPlaying)
                       ? null
                       : () {
-                          // テスト用のサンプルテキスト
-                          // 実際の使用時は小説のテキストを渡す
-                          notifier.play('これはテスト用のテキストです。');
+                          // Issue #10: 小説コンテンツ全体を順次再生
+                          notifier.play();
                         },
                   icon: const Icon(Icons.play_arrow),
                   iconSize: 32,
@@ -51,9 +63,9 @@ class PlaybackController extends ConsumerWidget {
 
                 // 一時停止ボタン
                 IconButton.filled(
-                  onPressed: playbackState.isPlaying
-                      ? () => notifier.pause()
-                      : null,
+                  onPressed: (!isNovelPageWithContent || !playbackState.isPlaying)
+                      ? null
+                      : () => notifier.pause(),
                   icon: const Icon(Icons.pause),
                   iconSize: 32,
                   tooltip: '一時停止',
@@ -61,10 +73,11 @@ class PlaybackController extends ConsumerWidget {
 
                 // 停止ボタン
                 IconButton.filled(
-                  onPressed: playbackState.isPlaying ||
-                          playbackState.currentPosition > 0
-                      ? () => notifier.stop()
-                      : null,
+                  onPressed: (!isNovelPageWithContent ||
+                          (!playbackState.isPlaying &&
+                              playbackState.currentPosition == 0))
+                      ? null
+                      : () => notifier.stop(),
                   icon: const Icon(Icons.stop),
                   iconSize: 32,
                   tooltip: '停止',

@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../domain/models/webview_state.dart';
+import '../../html_parser/application/narou_url_detector.dart';
 
 part 'webview_notifier.g.dart';
 
@@ -47,5 +48,22 @@ class WebViewNotifier extends _$WebViewNotifier {
   /// ページタイトルの更新（将来使用）
   void updatePageTitle(String? title) {
     state = state.copyWith(pageTitle: title);
+  }
+
+  /// 小説ページかどうかを判定して状態を更新（Issue #10）
+  void checkNovelPage(String url) {
+    final isNovel = NarouUrlDetector.isNovelPage(url);
+    state = state.copyWith(
+      isNovelPage: isNovel,
+      currentNovelUrl: isNovel ? url : null,
+    );
+  }
+
+  /// 小説ページ情報をクリア（Issue #10）
+  void clearNovelPage() {
+    state = state.copyWith(
+      isNovelPage: false,
+      currentNovelUrl: null,
+    );
   }
 }

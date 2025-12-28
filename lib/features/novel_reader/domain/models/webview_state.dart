@@ -20,5 +20,11 @@ class WebViewState with _$WebViewState {
 
     /// ページタイトル（将来使用）
     String? pageTitle,
+
+    /// 小説ページかどうか（Issue #10）
+    @Default(false) bool isNovelPage,
+
+    /// 現在の小説URL（Issue #10）
+    String? currentNovelUrl,
   }) = _WebViewState;
 }

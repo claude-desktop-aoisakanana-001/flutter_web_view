@@ -31,6 +31,12 @@ mixin _$WebViewState {
   /// ページタイトル（将来使用）
   String? get pageTitle => throw _privateConstructorUsedError;
 
+  /// 小説ページかどうか（Issue #10）
+  bool get isNovelPage => throw _privateConstructorUsedError;
+
+  /// 現在の小説URL（Issue #10）
+  String? get currentNovelUrl => throw _privateConstructorUsedError;
+
   /// Create a copy of WebViewState
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -49,7 +55,9 @@ abstract class $WebViewStateCopyWith<$Res> {
       bool isLoading,
       bool canGoBack,
       bool canGoForward,
-      String? pageTitle});
+      String? pageTitle,
+      bool isNovelPage,
+      String? currentNovelUrl});
 }
 
 /// @nodoc
@@ -72,6 +80,8 @@ class _$WebViewStateCopyWithImpl<$Res, $Val extends WebViewState>
     Object? canGoBack = null,
     Object? canGoForward = null,
     Object? pageTitle = freezed,
+    Object? isNovelPage = null,
+    Object? currentNovelUrl = freezed,
   }) {
     return _then(_value.copyWith(
       currentUrl: null == currentUrl
@@ -94,6 +104,14 @@ class _$WebViewStateCopyWithImpl<$Res, $Val extends WebViewState>
           ? _value.pageTitle
           : pageTitle // ignore: cast_nullable_to_non_nullable
               as String?,
+      isNovelPage: null == isNovelPage
+          ? _value.isNovelPage
+          : isNovelPage // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentNovelUrl: freezed == currentNovelUrl
+          ? _value.currentNovelUrl
+          : currentNovelUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -111,7 +129,9 @@ abstract class _$$WebViewStateImplCopyWith<$Res>
       bool isLoading,
       bool canGoBack,
       bool canGoForward,
-      String? pageTitle});
+      String? pageTitle,
+      bool isNovelPage,
+      String? currentNovelUrl});
 }
 
 /// @nodoc
@@ -132,6 +152,8 @@ class __$$WebViewStateImplCopyWithImpl<$Res>
     Object? canGoBack = null,
     Object? canGoForward = null,
     Object? pageTitle = freezed,
+    Object? isNovelPage = null,
+    Object? currentNovelUrl = freezed,
   }) {
     return _then(_$WebViewStateImpl(
       currentUrl: null == currentUrl
@@ -154,6 +176,14 @@ class __$$WebViewStateImplCopyWithImpl<$Res>
           ? _value.pageTitle
           : pageTitle // ignore: cast_nullable_to_non_nullable
               as String?,
+      isNovelPage: null == isNovelPage
+          ? _value.isNovelPage
+          : isNovelPage // ignore: cast_nullable_to_non_nullable
+              as bool,
+      currentNovelUrl: freezed == currentNovelUrl
+          ? _value.currentNovelUrl
+          : currentNovelUrl // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -166,7 +196,9 @@ class _$WebViewStateImpl implements _WebViewState {
       this.isLoading = false,
       this.canGoBack = false,
       this.canGoForward = false,
-      this.pageTitle});
+      this.pageTitle,
+      this.isNovelPage = false,
+      this.currentNovelUrl});
 
   /// 現在表示中のURL
   @override
@@ -192,9 +224,18 @@ class _$WebViewStateImpl implements _WebViewState {
   @override
   final String? pageTitle;
 
+  /// 小説ページかどうか（Issue #10）
+  @override
+  @JsonKey()
+  final bool isNovelPage;
+
+  /// 現在の小説URL（Issue #10）
+  @override
+  final String? currentNovelUrl;
+
   @override
   String toString() {
-    return 'WebViewState(currentUrl: $currentUrl, isLoading: $isLoading, canGoBack: $canGoBack, canGoForward: $canGoForward, pageTitle: $pageTitle)';
+    return 'WebViewState(currentUrl: $currentUrl, isLoading: $isLoading, canGoBack: $canGoBack, canGoForward: $canGoForward, pageTitle: $pageTitle, isNovelPage: $isNovelPage, currentNovelUrl: $currentNovelUrl)';
   }
 
   @override
@@ -211,12 +252,16 @@ class _$WebViewStateImpl implements _WebViewState {
             (identical(other.canGoForward, canGoForward) ||
                 other.canGoForward == canGoForward) &&
             (identical(other.pageTitle, pageTitle) ||
-                other.pageTitle == pageTitle));
+                other.pageTitle == pageTitle) &&
+            (identical(other.isNovelPage, isNovelPage) ||
+                other.isNovelPage == isNovelPage) &&
+            (identical(other.currentNovelUrl, currentNovelUrl) ||
+                other.currentNovelUrl == currentNovelUrl));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, currentUrl, isLoading, canGoBack, canGoForward, pageTitle);
+  int get hashCode => Object.hash(runtimeType, currentUrl, isLoading, canGoBack,
+      canGoForward, pageTitle, isNovelPage, currentNovelUrl);
 
   /// Create a copy of WebViewState
   /// with the given fields replaced by the non-null parameter values.
@@ -233,7 +278,9 @@ abstract class _WebViewState implements WebViewState {
       final bool isLoading,
       final bool canGoBack,
       final bool canGoForward,
-      final String? pageTitle}) = _$WebViewStateImpl;
+      final String? pageTitle,
+      final bool isNovelPage,
+      final String? currentNovelUrl}) = _$WebViewStateImpl;
 
   /// 現在表示中のURL
   @override
@@ -254,6 +301,14 @@ abstract class _WebViewState implements WebViewState {
   /// ページタイトル（将来使用）
   @override
   String? get pageTitle;
+
+  /// 小説ページかどうか（Issue #10）
+  @override
+  bool get isNovelPage;
+
+  /// 現在の小説URL（Issue #10）
+  @override
+  String? get currentNovelUrl;
 
   /// Create a copy of WebViewState
   /// with the given fields replaced by the non-null parameter values.
