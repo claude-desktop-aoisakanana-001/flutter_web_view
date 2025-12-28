@@ -83,6 +83,63 @@ class NovelReaderNotifier extends _$NovelReaderNotifier {
     }
   }
 
+  /// WebViewController から小説を読み込む（Issue #10）
+  ///
+  /// 既存の WebViewController を使用して小説を解析します。
+  /// これは NovelReaderScreen の WebView から直接コンテンツを抽出する際に使用します。
+  ///
+  /// [controller] 既に初期化済みの WebViewController
+  /// [url] 小説のURL
+  Future<void> loadNovelFromController(
+    WebViewController controller,
+    String url,
+  ) async {
+    // ローディング開始
+    state = state.copyWith(
+      isLoading: true,
+      errorMessage: null,
+    );
+
+    try {
+      // NarouParserService を使用して小説を解析
+      final parserService = ref.read(narouParserServiceProvider.notifier);
+      final parsedNovel = await parserService.parseFromWebView(
+        webViewController: controller,
+        url: url,
+      );
+
+      // NovelContent に変換
+      final novelContent = NovelContent(
+        title: parsedNovel.title,
+        author: parsedNovel.author,
+        url: url,
+        paragraphs: parsedNovel.paragraphs,
+        fetchedAt: DateTime.now(),
+      );
+
+      // 状態を更新
+      state = state.copyWith(
+        novelContent: novelContent,
+        isLoading: false,
+        errorMessage: null,
+      );
+    } catch (e) {
+      // エラーハンドリング
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: '小説の読み込みに失敗しました: $e',
+      );
+    }
+  }
+
+  /// 小説コンテンツをクリア（Issue #10）
+  ///
+  /// 小説ページから離れた際に、コンテンツだけをクリアします。
+  /// 状態全体をリセットせず、novelContent だけを null にします。
+  void clearContent() {
+    state = state.copyWith(novelContent: null);
+  }
+
   /// ハイライト位置を設定
   ///
   /// [position] 段落のインデックス

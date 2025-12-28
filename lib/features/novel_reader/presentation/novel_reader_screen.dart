@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-// import 'package:yomiagerun_app/features/novel_reader/application/novel_reader_notifier.dart';
+import 'package:yomiagerun_app/features/novel_reader/application/novel_reader_notifier.dart';
 // import 'package:yomiagerun_app/features/novel_reader/presentation/novel_content_view.dart';
 import 'package:yomiagerun_app/features/novel_reader/application/webview_notifier.dart';
 import 'package:yomiagerun_app/features/tts/presentation/speed_settings.dart';
@@ -64,6 +64,21 @@ class _NovelReaderScreenState extends ConsumerState<NovelReaderScreen> {
           canGoBack: canGoBack,
           canGoForward: canGoForward,
         );
+
+    // Issue #10: 小説ページ検出と自動抽出
+    ref.read(webViewNotifierProvider.notifier).checkNovelPage(url);
+    final webViewState = ref.read(webViewNotifierProvider);
+
+    if (webViewState.isNovelPage) {
+      // 小説ページの場合、自動的にコンテンツを抽出
+      await ref.read(novelReaderNotifierProvider.notifier).loadNovelFromController(
+            _controller,
+            url,
+          );
+    } else {
+      // 小説ページでない場合、コンテンツをクリア
+      ref.read(novelReaderNotifierProvider.notifier).clearContent();
+    }
   }
 
   /// エラー発生時の処理
